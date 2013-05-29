@@ -3,9 +3,25 @@ Pinky.js
 
 Pinky.js is an implementation of the [Promises/A+](http://promises-aplus.github.io/promises-spec/) in JavaScript.
 
+Usage
+=========
+
+Pinky (incompletely)implements the Promises/A+ standard. It does so in way that emulates the .Net `Task` class.
+
+    var promise = Pinky.Promise(function() {
+      // Do something asynchronously
+    });
+    
+    promise.then(function(value) {
+      // Do something interesting with your successful value
+    },
+    
+    function(error) {
+      // Do something with the error condition
+    });
 
 License
-==========
+=========
 
 The MIT License (MIT)
 
