@@ -54,8 +54,8 @@ describe('Pinky.js', function() {
           });
 
           p.then(function(value) {
-            if (called)
-              done();
+            assert.equal(called, true)
+            done();
           });
         });
 
@@ -78,6 +78,33 @@ describe('Pinky.js', function() {
           });
 
           p.then(null, function(error) {
+            done();
+          });
+        });
+
+        it('calls onRejected with the error', function(done) {
+          var p = new Pinky.Promise(function() {
+            throw new Error('Ouch!');
+          });
+
+          p.then(null, function(error) {
+            assert.equal(error.message, 'Ouch!');
+            done();
+          });
+        });
+
+        it('calls multiple onRejected handlers, in order', function(done) {
+          var p = new Pinky.Promise(function() {
+            throw new Error('So much pain!');
+          });
+
+          var called = false;
+          p.then(null, function(error) {
+            called = true;
+          });
+
+          p.then(null, function(error) {
+            assert(called, true)
             done();
           });
         });
