@@ -141,6 +141,16 @@ describe('Pinky.js', function() {
         });
       });
 
+      it('should return before raising callbacks', function(done) {
+        var p = new Pinky.Promise(function() {
+        });
+
+        var p2 = p.then(function() {
+          assert.equal(typeof(p2), 'object')
+          done();
+        });
+      });
+
     });
 
   });
