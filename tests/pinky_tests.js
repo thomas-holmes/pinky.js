@@ -47,16 +47,28 @@ describe('Pinky.js', function() {
         var p = new Pinky.Promise(function() {
         });
 
-        var called = 0;
+        var called = false
         p.then(function(value) {
-          ++called
+          called = true
         });
 
         p.then(function(value) {
-          if (called = 1)
+          if (called)
             done();
         });
       });
+
+      it('should call onFulfilled with promise value when complete', function(done) {
+        var p = new Pinky.Promise(function() {
+          return "test!";
+        });
+
+        p.then(function(value) {
+          assert.equal(value, "test!")
+          done()
+        });
+      });
+
     });
 
   });
