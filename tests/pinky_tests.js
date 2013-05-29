@@ -34,8 +34,63 @@ describe('Pinky.js', function() {
         assert.equal(Object.getPrototypeOf(p2), Pinky.Promise.prototype);
       });
 
-      it('calls onFulfilled function when complete', function(done) {
+      describe('onFulfilled', function() {
+        it('calls onFulfilled function when complete', function(done) {
+          var p = new Pinky.Promise(function() {
+          });
+
+          p.then(function(value) {
+            done();
+          });
+        });
+
+        it('should call multiple onFulfilled functions when complete', function(done) {
+          var p = new Pinky.Promise(function() {
+          });
+
+          var called = false
+          p.then(function(value) {
+            called = true
+          });
+
+          p.then(function(value) {
+            if (called)
+              done();
+          });
+        });
+
+        it('should call onFulfilled with promise value when complete', function(done) {
+          var p = new Pinky.Promise(function() {
+            return 'test!';
+          });
+
+          p.then(function(value) {
+            assert.equal(value, 'test!')
+            done()
+          });
+        });
+      });
+
+      describe('onRejected', function() {
+        it('calls onRejected function when promise is rejected', function(done) {
+          var p = new Pinky.Promise(function() {
+            throw new Error('Failure!');
+          });
+
+          p.then(null, function(error) {
+            done();
+          });
+        });
+      });
+
+      it('should not call onRejected if onFulfilled is called', function(done) {
         var p = new Pinky.Promise(function() {
+        });
+
+        p.then(function(value) {
+        },
+        function(error) {
+          throw new Error('onRejected should not be called')
         });
 
         p.then(function(value) {
@@ -43,29 +98,19 @@ describe('Pinky.js', function() {
         });
       });
 
-      it('should call multiple onFulfilled functions when complete', function(done) {
+      it('should not call onFulfilled if onRejected is called', function(done) {
         var p = new Pinky.Promise(function() {
-        });
-
-        var called = false
-        p.then(function(value) {
-          called = true
+          throw new Error('Failure!')
         });
 
         p.then(function(value) {
-          if (called)
-            done();
-        });
-      });
-
-      it('should call onFulfilled with promise value when complete', function(done) {
-        var p = new Pinky.Promise(function() {
-          return "test!";
+          throw new Error('onFulfilled should not be called')
+        },
+        function(error) {
         });
 
-        p.then(function(value) {
-          assert.equal(value, "test!")
-          done()
+        p.then(null, function(value) {
+          done();
         });
       });
 
