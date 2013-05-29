@@ -17,7 +17,6 @@ describe('Pinky.js', function() {
     });
 
     it('executes task', function(done) {
-      console.log('executing task')
       var p = new Pinky.Promise(function() {
         done();
       });
@@ -41,6 +40,21 @@ describe('Pinky.js', function() {
 
         p.then(function(value) {
           done();
+        });
+      });
+
+      it('should call multiple onFulfilled functions when complete', function(done) {
+        var p = new Pinky.Promise(function() {
+        });
+
+        var called = 0;
+        p.then(function(value) {
+          ++called
+        });
+
+        p.then(function(value) {
+          if (called = 1)
+            done();
         });
       });
     });
