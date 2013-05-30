@@ -158,7 +158,33 @@ describe('Pinky.js', function() {
       });
 
     });
+  });
 
+  describe('PromiseCompletionSource', function() {
+    it('provides a promise', function() {
+      var s = new Pinky.PromiseCompletionSource;
+      var p = s.getPromise();
+      assert.equal(Object.getPrototypeOf(p), Pinky.OuterPromise.prototype);
+    });
+
+    it('can fulfill provided promise', function(done) {
+      var s = new Pinky.PromiseCompletionSource;
+      var p = s.getPromise();
+      p.then(function() {
+        done();
+      });
+      s.fulfill(50);
+    });
+
+    it('can fulfill provided promise with correct value', function(done) {
+      var s = new Pinky.PromiseCompletionSource;
+      var p = s.getPromise();
+      p.then(function(value) {
+        assert.equal(value, 50);
+        done();
+      });
+      s.fulfill(50);
+    });
   });
 
 });
