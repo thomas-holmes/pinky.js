@@ -167,27 +167,38 @@ describe('Pinky.js', function() {
       assert.equal(Object.getPrototypeOf(p), Pinky.OuterPromise.prototype);
     });
 
-    it('can fulfill provided promise', function(done) {
-      var s = new Pinky.PromiseCompletionSource;
-      var p = s.getPromise();
-      p.then(function() {
-        done();
+    describe('fulfillment', function() {
+      it('can fulfill a promise', function(done) {
+        var s = new Pinky.PromiseCompletionSource;
+        var p = s.getPromise();
+        p.then(function() {
+          done();
+        });
+        s.fulfill(50);
       });
-      s.fulfill(50);
-    });
 
-    it('can call multiple onFulfilled callbacks in order', function(done) {
-      var s = new Pinky.PromiseCompletionSource;
-      var p = s.getPromise();
-      var called = false;
-      p.then(function(value) {
-        called = true;
+      it('can fulfill promise if value requested after it is available', function(done) {
+        var s = new Pinky.PromiseCompletionSource;
+        var p = s.getPromise();
+        s.fulfill(50);
+        p.then(function() {
+          done();
+        });
       });
-      p.then(function(value) {
-        assert.equal(called, true);
-        done();
+
+      it('can call multiple onFulfilled callbacks in order', function(done) {
+        var s = new Pinky.PromiseCompletionSource;
+        var p = s.getPromise();
+        var called = false;
+        p.then(function(value) {
+          called = true;
+        });
+        p.then(function(value) {
+          assert.equal(called, true);
+          done();
+        });
+        s.fulfill(50);
       });
-      s.fulfill(50);
     });
   });
 
