@@ -177,6 +177,16 @@ describe('Pinky.js', function() {
         s.fulfill(50);
       });
 
+      it('can fulfill a promise with the correct value', function(done) {
+        var s = new Pinky.PromiseCompletionSource;
+        var p = s.getPromise();
+        p.then(function(value) {
+          assert.equal(value, 50);
+          done();
+        });
+        s.fulfill(50);
+      });
+
       it('can fulfill promise if value requested after it is available', function(done) {
         var s = new Pinky.PromiseCompletionSource;
         var p = s.getPromise();
@@ -200,6 +210,49 @@ describe('Pinky.js', function() {
         s.fulfill(50);
       });
     });
-  });
 
+    describe('rejection', function() {
+      it('can reject a promise', function(done) {
+        var s = new Pinky.PromiseCompletionSource;
+        var p = s.getPromise();
+        p.then(null, function() {
+          done();
+        });
+        s.reject(new Error('Failure!'));
+      });
+
+      it('can reject a promise with the correct error', function(done) {
+        var s = new Pinky.PromiseCompletionSource;
+        var p = s.getPromise();
+        p.then(null, function(error) {
+          assert.equal(error.message, 'Failure!');
+          done();
+        });
+        s.reject(new Error('Failure!'));
+      });
+
+      it('can reject promise if value is requested after it is available', function(done) {
+        var s = new Pinky.PromiseCompletionSource;
+        var p = s.getPromise();
+        s.reject(new Error('Failure!'));
+        p.then(null, function() {
+          done();
+        });
+      });
+
+      it('can call multiple onRejected callbacks in order', function(done) {
+        var s = new Pinky.PromiseCompletionSource;
+        var p = s.getPromise();
+        var called = false;
+        p.then(null, function(value) {
+          called = true;
+        });
+        p.then(null, function(value) {
+          assert.equal(called, true);
+          done();
+        });
+        s.reject(new Error('Failure!'));
+      });
+    });
+  });
 });
