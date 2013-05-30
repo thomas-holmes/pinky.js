@@ -176,11 +176,15 @@ describe('Pinky.js', function() {
       s.fulfill(50);
     });
 
-    it('can fulfill provided promise with correct value', function(done) {
+    it('can call multiple onFulfilled callbacks in order', function(done) {
       var s = new Pinky.PromiseCompletionSource;
       var p = s.getPromise();
+      var called = false;
       p.then(function(value) {
-        assert.equal(value, 50);
+        called = true;
+      });
+      p.then(function(value) {
+        assert.equal(called, true);
         done();
       });
       s.fulfill(50);
