@@ -1,5 +1,5 @@
 var assert = require('assert')
-var pinky = require('../lib/pinky')
+var Pinky = require('../lib/pinky')
 
 describe('Pinky.js', function() {
   it('exists', function() {
@@ -28,10 +28,16 @@ describe('Pinky.js', function() {
         assert.equal(p.then.length, 2)
       });
 
-      it('returns a promise', function() {
-        var p = new Pinky.Promise;
-        var p2 = p.then(function(value){});
-        assert.equal(Object.getPrototypeOf(p2), Pinky.Promise.prototype);
+      describe('returns promise', function() {
+        it('any promise', function() {
+          var p = new Pinky.Promise;
+          var p2 = p.then(function(value){});
+          assert.equal(Object.getPrototypeOf(p2), Pinky.Promise.prototype);
+        });
+
+        // it('onFulfilled returns non-promise', functino() {
+        //   var p = P
+        // });
       });
 
       describe('onFulfilled', function() {
