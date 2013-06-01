@@ -20,7 +20,7 @@ describe('Pinky.js', function() {
   });
 
   describe('Promises/A+ Tests', function() {
-    //require("promises-aplus-tests").mocha(adapter)
+    require("promises-aplus-tests").mocha(adapter)
   });
 
   describe('PromiseSource', function() {
@@ -225,7 +225,7 @@ describe('Pinky.js', function() {
         s.fulfill(55);
       });
 
-      it('can fulfill if already rejected', function(done) {
+      it('can not fulfill if already rejected', function(done) {
         setTimeout(function() {
           assert.equal(val, 50);
           done();
