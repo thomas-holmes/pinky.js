@@ -1,9 +1,26 @@
 var assert = require('assert')
 var Pinky = require('../lib/pinky')
 
+adapter = {
+  pending: function() {
+    var source = new Pinky.PromiseSource();
+    var promise = source.getPromise(); 
+    
+    return {
+      promise: promise,
+      fulfill: source.fulfill,
+      reject: source.reject
+    }
+  }
+}
+
 describe('Pinky.js', function() {
   it('exists', function() {
     assert.equal(typeof(Pinky), 'object')
+  });
+
+  describe('Promises/A+ Tests', function() {
+    require("promises-aplus-tests").mocha(adapter)
   });
 
   describe('PromiseSource', function() {
