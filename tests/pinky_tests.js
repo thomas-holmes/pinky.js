@@ -65,6 +65,19 @@ describe('Pinky.js', function() {
             });
           });
 
+          it('that returns null', function(done) {
+            var s = new Pinky.PromiseSource();
+            var p = s.getPromise();
+            s.fulfill(50);
+            var p2 = p.then(function(value) {
+              return null
+            });
+            p2.then(function(value) {
+              assert.equal(value, null);
+              done();
+            });
+          });
+
           it('that returns a promise', function(done) {
             var s = new Pinky.PromiseSource();
             var p = s.getPromise();
@@ -93,6 +106,22 @@ describe('Pinky.js', function() {
               done();
             });
             s.fulfill(50);
+          });
+
+          it('returns a pseudo promise', function(done) {
+            var s = new Pinky.PromiseSource();
+            var p = s.getPromise();
+            s.fulfill(50);
+            var p2 = p.then(function() {
+              return {
+                then: function(f) { f('foo'); }
+              };
+            });
+
+            p2.then(function(value) {
+              assert.strictEqual(value, 'foo');
+              done();
+            });
           });
         });
 
