@@ -20,14 +20,151 @@ describe('Pinky.js', function() {
   });
 
   describe('Promises/A+ Tests', function() {
-    require("promises-aplus-tests").mocha(adapter)
+    //require("promises-aplus-tests").mocha(adapter)
   });
 
   describe('PromiseSource', function() {
-    it('provides a promise', function() {
-      var s = new Pinky.PromiseSource;
-      var p = s.getPromise();
-      assert.equal(Object.getPrototypeOf(p), Pinky.Promise.prototype);
+    describe('Promise', function() {
+      it('is returned', function() {
+        var s = new Pinky.PromiseSource;
+        var p = s.getPromise();
+        assert.equal(Object.getPrototypeOf(p), Pinky.Promise.prototype);
+      });
+
+      it('then returns before callback is called', function(done) {
+        var s = new Pinky.PromiseSource();
+        var p = s.getPromise();
+        s.fulfill(50);
+        var p2 = p.then(function() {
+          assert.notEqual(typeof p2, 'undefined')
+          done();
+        });
+      });
+
+      it('then returns a promise', function() {
+        var s = new Pinky.PromiseSource();
+        var p = s.getPromise();
+        s.fulfill(50);
+        var p2 = p.then();
+        assert.equal(Object.getPrototypeOf(p2), Pinky.Promise.prototype);
+      });
+
+      describe('onFulfilled', function() {
+        describe('is a function', function() {
+
+          it('that returns a value', function(done) {
+            var s = new Pinky.PromiseSource();
+            var p = s.getPromise();
+            s.fulfill(50);
+            var p2 = p.then(function(value) {
+              return value + 5;
+            });
+            p2.then(function(value) {
+              assert.equal(value, 55);
+              done();
+            });
+          });
+
+          it('that returns a promise', function(done) {
+            var s = new Pinky.PromiseSource();
+            var p = s.getPromise();
+            var p2 = p.then(function(value) {
+              var s2 = new Pinky.PromiseSource();
+              s2.fulfill(80);
+              return s2.getPromise()
+            });
+
+            p2.then(function(value) {
+              assert.equal(value, 80);
+              done();
+            });
+
+            s.fulfill(50);
+          });
+
+          it('that throws an error', function(done) {
+            var s = new Pinky.PromiseSource();
+            var p = s.getPromise();
+            var p2 = p.then(function() {
+              throw new Error('Failure!');
+            });
+            p2.then(null, function(error) {
+              assert.equal(error.message, 'Failure!');
+              done();
+            });
+            s.fulfill(50);
+          });
+        });
+
+        it('is a value', function(done) {
+          var s = new Pinky.PromiseSource();
+          var p = s.getPromise();
+          var p2 = p.then(17);
+          p2.then(function(value) {
+            assert.equal(value, 17);
+            done();
+          });
+          s.fulfill(50);
+        });
+      });
+
+      describe('onRejected', function() {
+        describe('is a function', function() {
+          it('that returns a value', function(done) {
+            var s = new Pinky.PromiseSource();
+            var p = s.getPromise();
+            s.reject(new Error('Failure!'));
+            var p2 = p.then(null, function(error) {
+              return new Error('Double Failure!');
+            });
+            p2.then(function(value) {
+              assert.equal(value.message, 'Double Failure!');
+              done();
+            });
+          });
+
+          it('that returns a promise', function(done) {
+            var s = new Pinky.PromiseSource();
+            var p = s.getPromise();
+            var p2 = p.then(null, function(value) {
+              var s2 = new Pinky.PromiseSource();
+              s2.fulfill(80);
+              return s2.getPromise()
+            });
+
+            p2.then(function(value) {
+              assert.equal(value, 80);
+              done();
+            });
+
+            s.reject(50);
+          });
+
+          it('that throws an error', function(done) {
+            var s = new Pinky.PromiseSource();
+            var p = s.getPromise();
+            var p2 = p.then(null, function() {
+              throw new Error('Failure 2!');
+            });
+            p2.then(null, function(error) {
+              assert.equal(error.message, 'Failure 2!');
+              done();
+            });
+            s.reject(new Error('Failure!'));
+          });
+        });
+
+        it('is a value', function(done) {
+          var s = new Pinky.PromiseSource();
+          var p = s.getPromise();
+          var p2 = p.then(null, 17);
+          p2.then(null, function(value) {
+            assert.equal(value, 17);
+            done();
+          });
+          s.reject(50);
+        });
+      });
     });
 
     describe('fulfillment', function() {
@@ -72,6 +209,39 @@ describe('Pinky.js', function() {
         });
         s.fulfill(50);
       });
+
+      it('can only fulfill once', function(done) {
+        setTimeout(function() {
+          assert.equal(50, val);
+          done();
+        }, 5);
+        var s = new Pinky.PromiseSource();
+        var p = s.getPromise();
+        var val = undefined;
+        p.then(function(value) {
+          val = value;
+        });
+        s.fulfill(50);
+        s.fulfill(55);
+      });
+
+      it('can fulfill if already rejected', function(done) {
+        setTimeout(function() {
+          assert.equal(val, 50);
+          done();
+        }, 5);
+        var s = new Pinky.PromiseSource();
+        var p = s.getPromise();
+        var val = undefined;
+        p.then(function(value) {
+          val = value;
+        },
+        function(error) {
+          val = error;
+        });
+        s.reject(50);
+        s.fulfill(55);
+      });
     });
 
     describe('rejection', function() {
@@ -115,6 +285,39 @@ describe('Pinky.js', function() {
           done();
         });
         s.reject(new Error('Failure!'));
+      });
+
+      it('can only reject once', function(done) {
+        setTimeout(function() {
+          assert.equal(val, 50);
+          done();
+        }, 5);
+        var s = new Pinky.PromiseSource();
+        var p = s.getPromise();
+        var val = undefined;
+        p.then(null, function(error) {
+          val = error;
+        });
+        s.reject(50);
+        s.reject(55);
+      });
+
+      it('can not reject if already fulfilled', function(done) {
+        setTimeout(function() {
+          assert.equal(val, 50);
+          done();
+        }, 5);
+        var s = new Pinky.PromiseSource();
+        var p = s.getPromise();
+        var val = undefined;
+        p.then(function(value) {
+          val = value;
+        },
+        function(error) {
+          val = error;
+        });
+        s.fulfill(50);
+        s.reject(55);
       });
     });
   });

@@ -1,3 +1,3 @@
 #!/bin/bash
 
-mocha -t 100 --compilers coffee:coffee-script `dirname $0`/tests
+mocha -t 250 --compilers coffee:coffee-script `dirname $0`/tests
