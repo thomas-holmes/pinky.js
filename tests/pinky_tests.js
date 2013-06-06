@@ -123,17 +123,46 @@ describe('Pinky.js', function() {
               done();
             });
           });
+
+          it('returns undefined', function(done) {
+            var s = new Pinky.PromiseSource();
+            var p = s.getPromise();
+            var p2 = p.then(function(value) {
+              undefined
+            });
+
+            p2.then(function(value) {
+              assert.strictEqual(value, undefined);
+              done();
+            });
+            s.fulfill(50);
+          });
         });
 
-        it('is a value', function(done) {
-          var s = new Pinky.PromiseSource();
-          var p = s.getPromise();
-          var p2 = p.then(17);
-          p2.then(function(value) {
-            assert.equal(value, 17);
-            done();
+        describe('is not a function', function() {
+          it('is a value', function(done) {
+            var s = new Pinky.PromiseSource();
+            var p = s.getPromise();
+            var p2 = p.then(17);
+            p2.then(function(value) {
+              assert.equal(value, 50);
+              done();
+            });
+            s.fulfill(50);
           });
-          s.fulfill(50);
+
+
+          it('is undefined', function(done) {
+            var s = new Pinky.PromiseSource();
+            var p = s.getPromise();
+            var p2 = p.then(undefined);
+
+            p2.then(function(value) {
+              assert.strictEqual(value, 50);
+              done();
+            });
+            s.fulfill(50);
+          });
         });
       });
 
@@ -183,16 +212,19 @@ describe('Pinky.js', function() {
           });
         });
 
-        it('is a value', function(done) {
-          var s = new Pinky.PromiseSource();
-          var p = s.getPromise();
-          var p2 = p.then(null, 17);
-          p2.then(null, function(value) {
-            assert.equal(value, 17);
-            done();
+        describe('is not a function', function() {
+          it('is a value', function(done) {
+            var s = new Pinky.PromiseSource();
+            var p = s.getPromise();
+            var p2 = p.then(null, 17);
+            p2.then(null, function(value) {
+              assert.equal(value, 50);
+              done();
+            });
+            s.reject(50);
           });
-          s.reject(50);
         });
+
       });
     });
 
