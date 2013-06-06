@@ -12,8 +12,6 @@ Pinky is an implementation of the Promises/A+ standard. It does so in way that e
     var promiseSource = new Pinky.PromiseSource();
     
     var promise = promiseSource.getPromise()
-      // Do something asynchronously
-    });
     
     promise.then(function(value) {
       // Do something interesting with your successful value
