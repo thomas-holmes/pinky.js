@@ -1,12 +1,12 @@
 Pinky.js
 =========
 
-Pinky.js is an implementation of the [Promises/A+](http://promises-aplus.github.io/promises-spec/) in JavaScript.
+Pinky.js is an implementation of the [Promises/A+](http://promises-aplus.github.io/promises-spec/) in JavaScript. It is fully compliant with the spec but is still pre-alpha quality code. Use it at your own risk.
 
 Usage
 =========
 
-Pinky (incompletely)implements the Promises/A+ standard. It does so in way that emulates the .Net `Task` class.
+Pinky is an implementation of the Promises/A+ standard. It does so in way that emulates the .Net `Task` class.
 
     // The promise source is how you fulfill or reject a promise
     var promiseSource = new Pinky.PromiseSource();
