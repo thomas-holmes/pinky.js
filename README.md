@@ -8,17 +8,21 @@ Usage
 
 Pinky (incompletely)implements the Promises/A+ standard. It does so in way that emulates the .Net `Task` class.
 
-    var promise = Pinky.Promise(function() {
+    // The promise source is how you fulfill or reject a promise
+    var promiseSource = new Pinky.PromiseSource();
+    
+    var promise = promiseSource.getPromise()
       // Do something asynchronously
     });
     
     promise.then(function(value) {
       // Do something interesting with your successful value
     },
-    
     function(error) {
       // Do something with the error condition
     });
+
+    promiseSource.fulfill(50);
 
 License
 =========
